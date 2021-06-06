@@ -1,17 +1,27 @@
 {
-    "name": "nodejs",
-    "version": "1.0.0",
-    "description": "",
-    "main": "modules.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node index"
-    },
-    "author": "subodh",
-    "license": "ISC",
-    "dependencies": {
-        "body-parser": "^1.19.0",
-        "express": "^4.17.1",
-        "morgan": "^1.10.0"
-    }
+  "name": "nodejs",
+  "version": "1.0.0",
+  "main": "modules.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
+  },
+  "author": "subodh",
+  "license": "ISC",
+  "dependencies": {
+    "bin": "0.0.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subodhkum20/nodeJs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/subodhkum20/nodeJs/issues"
+  },
+  "homepage": "https://github.com/subodhkum20/nodeJs#readme",
+  "description": ""
 }
