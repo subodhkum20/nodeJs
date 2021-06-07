@@ -2,11 +2,23 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
 const commentSchema = new schema({
-    comment: {
+    rating:{
+        type: 'number',
+        required: true,
+        max:5,
+        min:1
+    },
+    comments: {
         type: 'string',
+        // required: true
+    },
+    author:{
+        type:'string',
         required: true
     }
-})
+},
+    { timestamp: true }
+)
 
 const dishSchema = new schema({
     name: {
@@ -17,7 +29,8 @@ const dishSchema = new schema({
     description: {
         type: 'string',
         required: true
-    }
+    },
+    comments: [commentSchema]
 },
     {
         timestamp: true
