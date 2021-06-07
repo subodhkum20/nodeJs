@@ -6,7 +6,7 @@ const connect = mongoose.connect(url, { useUnifiedTopology: true, useNewUrlParse
 connect.then((db) => {
     console.log("successfully connected to database");
     return dishes.create({
-        name: "k",
+        name: "subodh",
         description: "javascript",
     }
     )
@@ -20,17 +20,19 @@ connect.then((db) => {
     console.log(dish);
     dish.comments.push({
         rating: 5,
-        comment: 'i am subodh',
+        comments: 'i am subodh',
         author: 'subodh'
     })
     return dish.save();
-}).then((dish) => {
+})
+.then((dish) => {
     console.log(dish)
 
     return dishes.deleteMany({});
 }).then((result) => {
     return console.log(result)
-}).then(() => {
+})
+.then(() => {
     return mongoose.connection.close();
 })
     .catch(err => {
