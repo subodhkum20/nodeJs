@@ -12,6 +12,7 @@ var session=require('express-session');
 var FileStore=require('session-file-store')(session);
 var promoRouter = require('./routes/promoRouter');
 const { sign } = require('crypto');
+// const { 401 } = require('http-errors');
 
 var url = 'mongodb://localhost:27017/';
 
@@ -41,53 +42,32 @@ app.use(session({
   resave: false,
   store: new FileStore()
 }));
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
 function auth(req, res, next) {
   console.log(req.session)
   if(!req.session.user){
-    var authHeader = req.headers.authorization;
-    if (!authHeader) {
-      // console.log(authHeader);
-      var err = new Error('you are not authenticated');
-      res.setHeader( 'WWW-Authenticate', 'Basic' )
-      err.status = 401;
-      next(err);
-      return;
+    var err = new Error('you are not authenticated');
+    res.setHeader('www-authenticate', 'basic');
+    res.statusCode=401;
+    return next(err);
+    
     }
-    var user = new Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    const username = user[0];
-    const password = user[1];
-    if (username == 'admin' && password == 'password') {
-      // res.cookie('user','admin',{signed: true});
-      req.session.user='admin';
-      next();
-    }
-    else {
+    else if(req.session.user!='authenticated'){
       var err = new Error('you are not authenticated');
       res.setHeader ('WWW-Authenticate','Basic' )
       err.status = 401;
       next(err);
       return;
-    }
-  }
-  else{
-    if(req.session.user==='admin'){
-      // console.log(req.signedCookies.user);
-      next();
     }
     else{
-      console.log(req.session.user);
-      var err = new Error('you are not authenticated');
-      res.setHeader ('WWW-Authenticate','Basic' )
-      err.status = 401;
-      next(err);
+      next()
     }
-  }
-}
+}    // console.log(req.signedCookies.user);
+   
 
 app.use(auth)
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/dishes', dishRouter);
 app.use('/leaders', leaderRouter);
 app.use('/promotions', promoRouter);
