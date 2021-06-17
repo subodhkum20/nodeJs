@@ -8,8 +8,10 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dishRouter = require('./routes/dishRouter');
 var leaderRouter = require('./routes/leaderRouter');
-var session=require('express-session');
-var FileStore=require('session-file-store')(session);
+var session = require('express-session');
+var passport = require('passport')
+var authenticate=require('./authenticate')
+var FileStore = require('session-file-store')(session);
 var promoRouter = require('./routes/promoRouter');
 const { sign } = require('crypto');
 // const { 401 } = require('http-errors');
@@ -42,29 +44,23 @@ app.use(session({
   resave: false,
   store: new FileStore()
 }));
+app.use(passport.initialize());
+app.use(passport.session())
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 function auth(req, res, next) {
-  console.log(req.session)
-  if(!req.session.user){
+  if (!req.user) {
     var err = new Error('you are not authenticated');
     res.setHeader('www-authenticate', 'basic');
-    res.statusCode=401;
+    res.statusCode = 403;
     return next(err);
-    
-    }
-    else if(req.session.user!='authenticated'){
-      var err = new Error('you are not authenticated');
-      res.setHeader ('WWW-Authenticate','Basic' )
-      err.status = 401;
-      next(err);
-      return;
-    }
-    else{
-      next()
-    }
+
+  }
+  else {
+    next()
+  }
 }    // console.log(req.signedCookies.user);
-   
+
 
 app.use(auth)
 
