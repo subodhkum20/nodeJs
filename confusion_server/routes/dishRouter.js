@@ -90,7 +90,7 @@ DishRouter.route('/:DishId/:comments')
             .then((Dish) => {
                 if (Dish != null && req.body.author != null && req.body.comment != null && req.body.rating != null) {
                     Dish.comments.push(req.body);
-                    Dish.save().then((Dish)=>{
+                    Dish.save().then((Dish) => {
 
                         res.statusCode = 200;
                         res.setHeader('Content-type', 'application/json');
@@ -118,7 +118,7 @@ DishRouter.route('/:DishId/:comments')
                 // Dish.comments.forEach((comment) => {
                 //     Dish.comments.id(comment._id).remove()
                 // })
-                for (var i = (Dish.comments.length -1); i >= 0; i--) {
+                for (var i = (Dish.comments.length - 1); i >= 0; i--) {
                     Dish.comments.id(Dish.comments[i]._id).remove();
                 }
                 Dish.save().then((Dish) => {
@@ -147,15 +147,15 @@ DishRouter.route('/:DishId/:comments/:commentId')
                     res.json(Dish.comments.id(req.params.commentId));
 
                 }
-                else if(Dish!=null&&Dish.comments.id(req.params.commentId) == null){
-                    err = new Error('Dish ' + req.params.DishId+`/comments/${req.params.commentId}` + ' not found');
-            err.status = 404;
-            return next(err);
+                else if (Dish != null && Dish.comments.id(req.params.commentId) == null) {
+                    err = new Error('Dish ' + req.params.DishId + `/comments/${req.params.commentId}` + ' not found');
+                    err.status = 404;
+                    return next(err);
                 }
-                else{
+                else {
                     err = new Error('Dish ' + req.params.DishId + ' not found');
-            err.status = 404;
-            return next(err);
+                    err.status = 404;
+                    return next(err);
                 }
             }, (err) => next(err)).catch((err) => next(err))
     })
@@ -182,15 +182,15 @@ DishRouter.route('/:DishId/:comments/:commentId')
                         })
                     }
                 }
-                else if(Dish!=null&&Dish.comments.id(req.params.commentId) == null){
-                    err = new Error('Dish ' + req.params.DishId+`/comments/${req.params.commentId}` + ' not found');
-            err.status = 404;
-            return next(err);
+                else if (Dish != null && Dish.comments.id(req.params.commentId) == null) {
+                    err = new Error('Dish ' + req.params.DishId + `/comments/${req.params.commentId}` + ' not found');
+                    err.status = 404;
+                    return next(err);
                 }
-                else{
+                else {
                     err = new Error('Dish ' + req.params.DishId + ' not found');
-                err.status = 404;
-                return next(err);
+                    err.status = 404;
+                    return next(err);
                 }
             }, (err) => next(err)).catch((err) => next(err))
     })
@@ -206,15 +206,15 @@ DishRouter.route('/:DishId/:comments/:commentId')
                         res.json(Dish);
                     })
                 }
-                else if(Dish!=null&&Dish.comments.id(req.params.commentId) == null){
-                    err = new Error('Dish ' + req.params.DishId+`/comments/${req.params.commentId}` + ' not found');
-            err.status = 404;
-            return next(err);
+                else if (Dish != null && Dish.comments.id(req.params.commentId) == null) {
+                    err = new Error('Dish ' + req.params.DishId + `/comments/${req.params.commentId}` + ' not found');
+                    err.status = 404;
+                    return next(err);
                 }
-                else{
+                else {
                     err = new Error('Dish ' + req.params.DishId + ' not found');
-            err.status = 404;
-            return next(err);
+                    err.status = 404;
+                    return next(err);
                 }
             }, (err) => next(err)).catch((err) => next(err))
     })
