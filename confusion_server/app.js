@@ -14,9 +14,10 @@ var authenticate=require('./authenticate')
 var FileStore = require('session-file-store')(session);
 var promoRouter = require('./routes/promoRouter');
 const { sign } = require('crypto');
+var config = require('./config')
 // const { 401 } = require('http-errors');
 
-var url = 'mongodb://localhost:27017/';
+var url = config.mongoUrl;
 
 var connect = mongoose.connect(url);
 connect.then((db) => {
@@ -37,32 +38,9 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-  name: 'session-id',
-  secret: '12345-67890-09876-54321',
-  saveUninitialized: false,
-  resave: false,
-  store: new FileStore()
-}));
 app.use(passport.initialize());
-app.use(passport.session())
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-function auth(req, res, next) {
-  if (!req.user) {
-    var err = new Error('you are not authenticated');
-    res.setHeader('www-authenticate', 'basic');
-    res.statusCode = 403;
-    return next(err);
-
-  }
-  else {
-    next()
-  }
-}    // console.log(req.signedCookies.user);
-
-
-app.use(auth)
 
 app.use('/dishes', dishRouter);
 app.use('/leaders', leaderRouter);

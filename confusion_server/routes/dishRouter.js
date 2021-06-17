@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const Dishes = require('../models/dishSchema');
+const authenticate=require('../authenticate')
 // const e = require('express');
 const DishRouter = express.Router();
 
@@ -16,7 +17,7 @@ DishRouter.route('/')
                 res.json(Dishes);
             }, (err) => next(err)).catch((err) => next(err))
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser,(req, res, next) => {
         Dishes.create(req.body).then((Dish) => {
             console.log(Dish);
             res.statusCode = 200;
@@ -25,11 +26,11 @@ DishRouter.route('/')
         }, (err) => next(err)).catch((err) => next(err))
 
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403
         res.end('put method not supported on /Dishes');
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser,(req, res, next) => {
         Dishes.deleteMany({}).then((result) => {
             console.log(result);
             res.statusCode = 200;
@@ -47,12 +48,12 @@ DishRouter.route('/:DishId')
             res.json(Dish);
         }, (err) => next(err)).catch((err) => next(err))
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403;
         res.end(`post method not supported on /Dishes/${req.params.DishId}`);
 
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser,(req, res, next) => {
         Dishes.findByIdAndUpdate(req.params.DishId, req.body).then((Dish) => {
             console.log(Dish);
             res.statusCode = 200;
@@ -60,7 +61,7 @@ DishRouter.route('/:DishId')
             res.json(Dish);
         }, (err) => next(err)).catch((err) => next(err))
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser,(req, res, next) => {
         Dishes.findByIdAndDelete(req.params.DishId).then((result) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'application/json');
@@ -85,7 +86,7 @@ DishRouter.route('/:DishId/:comments')
             }, (err) => next(err))
             .catch((err) => next(err))
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser,(req, res, next) => {
         Dishes.findById(req.params.DishId)
             .then((Dish) => {
                 if (Dish != null && req.body.author != null && req.body.comment != null && req.body.rating != null) {
@@ -108,11 +109,11 @@ DishRouter.route('/:DishId/:comments')
             }, (err) => next(err)).catch((err) => next(err))
 
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403
         res.end(`put method not supported on /Dishes/${req.params.DishId}/comments`);
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser,((req, res, next) => {
         Dishes.findById(req.params.DishId).then((Dish) => {
             if (Dish != null) {
                 // Dish.comments.forEach((comment) => {
@@ -134,7 +135,8 @@ DishRouter.route('/:DishId/:comments')
                 return next(err);
             }
         }, (err) => next(err)).catch((err) => next(err))
-    });
+    }))
+
 
 DishRouter.route('/:DishId/:comments/:commentId')
     .get((req, res, next) => {
@@ -159,12 +161,12 @@ DishRouter.route('/:DishId/:comments/:commentId')
                 }
             }, (err) => next(err)).catch((err) => next(err))
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403;
         res.end(`post method not supported on /Dishes/${req.params.DishId}/comments/${req.params.commentId}`);
 
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser,(req, res, next) => {
         Dishes.findById(req.params.DishId)
             .then((Dish) => {
                 if (Dish != null && Dish.comments.id(req.params.commentId) != null) {
@@ -194,7 +196,7 @@ DishRouter.route('/:DishId/:comments/:commentId')
                 }
             }, (err) => next(err)).catch((err) => next(err))
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser,(req, res, next) => {
         Dishes.findById(req.params.DishId)
             .then((Dish) => {
                 if (Dish != null && Dish.comments.id(req.params.commentId) != null) {
