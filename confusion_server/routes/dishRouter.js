@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const Dishes = require('../models/dishSchema');
-const authenticate=require('../authenticate')
+const authenticate = require('../authenticate')
 // const e = require('express');
 const DishRouter = express.Router();
 
@@ -10,14 +10,14 @@ DishRouter.use(bodyParser.urlencoded({ extended: false }));
 
 DishRouter.route('/')
     .get((req, res, next) => {
-        Dishes.find({})
+        Dishes.find({}).populate('comments.author')
             .then((Dishes) => {
                 res.statusCode = 200;
                 res.setHeader('Content-type', 'application/json');
                 res.json(Dishes);
             }, (err) => next(err)).catch((err) => next(err))
     })
-    .post(authenticate.verifyUser,(req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         Dishes.create(req.body).then((Dish) => {
             console.log(Dish);
             res.statusCode = 200;
@@ -26,11 +26,11 @@ DishRouter.route('/')
         }, (err) => next(err)).catch((err) => next(err))
 
     })
-    .put(authenticate.verifyUser,(req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403
         res.end('put method not supported on /Dishes');
     })
-    .delete(authenticate.verifyUser,(req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         Dishes.deleteMany({}).then((result) => {
             console.log(result);
             res.statusCode = 200;
@@ -41,27 +41,27 @@ DishRouter.route('/')
 
 DishRouter.route('/:DishId')
     .get((req, res, next) => {
-        Dishes.findById(req.params.DishId).then((Dish) => {
+        Dishes.findById(req.params.DishId).populate('comments.author').then((Dish) => {
             console.log(Dish);
             res.statusCode = 200;
             res.setHeader('Content-type', 'application/json');
             res.json(Dish);
         }, (err) => next(err)).catch((err) => next(err))
     })
-    .post(authenticate.verifyUser,(req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end(`post method not supported on /Dishes/${req.params.DishId}`);
 
     })
-    .put(authenticate.verifyUser,(req, res, next) => {
-        Dishes.findByIdAndUpdate(req.params.DishId, req.body).then((Dish) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
+        Dishes.findByIdAndUpdate(req.params.DishId, req.body).populate('comments.author').then((Dish) => {
             console.log(Dish);
             res.statusCode = 200;
             res.setHeader('Content-type', 'application/json');
             res.json(Dish);
         }, (err) => next(err)).catch((err) => next(err))
     })
-    .delete(authenticate.verifyUser,(req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         Dishes.findByIdAndDelete(req.params.DishId).then((result) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'application/json');
@@ -71,7 +71,7 @@ DishRouter.route('/:DishId')
     })
 DishRouter.route('/:DishId/:comments')
     .get((req, res, next) => {
-        Dishes.findById(req.params.DishId)
+        Dishes.findById(req.params.DishId).populate('comments.author')
             .then((Dish) => {
                 if (Dish != null) {
                     res.statusCode = 200;
@@ -86,16 +86,19 @@ DishRouter.route('/:DishId/:comments')
             }, (err) => next(err))
             .catch((err) => next(err))
     })
-    .post(authenticate.verifyUser,(req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.DishId)
             .then((Dish) => {
-                if (Dish != null && req.body.author != null && req.body.comment != null && req.body.rating != null) {
+                if (Dish != null && req.body.comment != null && req.body.rating != null) {
+                    req.body.author = req.user._id;
                     Dish.comments.push(req.body);
-                    Dish.save().then((Dish) => {
+                    Dish.save().then((dish) => {
+                        Dishes.findById(dish._id).populate('comments.author').then((Dish) => {
 
-                        res.statusCode = 200;
-                        res.setHeader('Content-type', 'application/json');
-                        res.json(Dish);
+                            res.statusCode = 200;
+                            res.setHeader('Content-type', 'application/json');
+                            res.json(Dish);
+                        })
                     })
                 }
                 else if (Dish != null) {
@@ -109,11 +112,11 @@ DishRouter.route('/:DishId/:comments')
             }, (err) => next(err)).catch((err) => next(err))
 
     })
-    .put(authenticate.verifyUser,(req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403
         res.end(`put method not supported on /Dishes/${req.params.DishId}/comments`);
     })
-    .delete(authenticate.verifyUser,((req, res, next) => {
+    .delete(authenticate.verifyUser, ((req, res, next) => {
         Dishes.findById(req.params.DishId).then((Dish) => {
             if (Dish != null) {
                 // Dish.comments.forEach((comment) => {
@@ -140,7 +143,7 @@ DishRouter.route('/:DishId/:comments')
 
 DishRouter.route('/:DishId/:comments/:commentId')
     .get((req, res, next) => {
-        Dishes.findById(req.params.DishId)
+        Dishes.findById(req.params.DishId).populate('comments.author')
             .then((Dish) => {
                 if (Dish != null && Dish.comments.id(req.params.commentId) != null) {
 
@@ -161,13 +164,13 @@ DishRouter.route('/:DishId/:comments/:commentId')
                 }
             }, (err) => next(err)).catch((err) => next(err))
     })
-    .post(authenticate.verifyUser,(req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end(`post method not supported on /Dishes/${req.params.DishId}/comments/${req.params.commentId}`);
 
     })
-    .put(authenticate.verifyUser,(req, res, next) => {
-        Dishes.findById(req.params.DishId)
+    .put(authenticate.verifyUser, (req, res, next) => {
+        Dishes.findById(req.params.DishId).populate('comments.author')
             .then((Dish) => {
                 if (Dish != null && Dish.comments.id(req.params.commentId) != null) {
                     if (req.body.rating != null) {
@@ -176,11 +179,12 @@ DishRouter.route('/:DishId/:comments/:commentId')
                             Dish.comments.id(req.params.commentId).comment = req.body.comment
                         };
 
-                        Dish.save().then((Dish) => {
-
-                            res.statusCode = 200;
-                            res.setHeader('Content-type', 'application/json');
-                            res.json(Dish);
+                        Dish.save().then((dish) => {
+                            Dishes.findById(dish._id).populate('comments.author').then((Dish) => {
+                                res.statusCode = 200;
+                                res.setHeader('Content-type', 'application/json');
+                                res.json(Dish);
+                            })
                         })
                     }
                 }
@@ -196,12 +200,12 @@ DishRouter.route('/:DishId/:comments/:commentId')
                 }
             }, (err) => next(err)).catch((err) => next(err))
     })
-    .delete(authenticate.verifyUser,(req, res, next) => {
-        Dishes.findById(req.params.DishId)
+    .delete(authenticate.verifyUser, (req, res, next) => {
+        Dishes.findById(req.params.DishId).populate('comments.author')
             .then((Dish) => {
                 if (Dish != null && Dish.comments.id(req.params.commentId) != null) {
                     Dish.comments.id(req.params.commentId).remove();
-                    Dish.save().then((Dish) => {
+                    Dish.save().populate('comments.author').then((Dish) => {
 
                         res.statusCode = 200;
                         res.setHeader('Content-type', 'application/json');
