@@ -7,8 +7,12 @@ var passport = require('passport')
 router.use(bodyParser.json())
 var authenticate = require('../authenticate')
 /* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
+router.get('/',authenticate.verifyUser,authenticate.verifyAdmin, function (req, res, next) {
+  users.find({}).then((users)=>{
+    res.setHeader('Content-Type', 'application/json'),
+    res.statusCode=200,
+    res.json(users)
+  })
 });
 router.post('/signup', (req, res, next) => {
   users.register(new users({ username: req.body.username }), req.body.password, (err, user) => {
