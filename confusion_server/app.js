@@ -7,6 +7,7 @@ var mongoose = require('mongoose');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dishRouter = require('./routes/dishRouter');
+var uploadRouter = require('./routes/uploadRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var session = require('express-session');
 var passport = require('passport')
@@ -51,7 +52,7 @@ app.all('*', (req, res, next) => {
 });
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
+app.use('/imageUpload', uploadRouter);
 app.use('/dishes', dishRouter);
 app.use('/leaders', leaderRouter);
 app.use('/promotions', promoRouter);
