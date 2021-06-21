@@ -7,6 +7,7 @@ let user = new Schema({
         type:"string",
         default:""
     },
+    facebookId:String,
     lastName:{
         type:"string",
         default:""
